@@ -1,0 +1,225 @@
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --pitch:       #15302A;
+  --pitch2:      #1a3a30;
+  --card:        rgba(255,255,255,0.055);
+  --card-border: rgba(255,255,255,0.10);
+  --accent:      #f0e040;
+  --accent-hover:#f7ec6a;
+  --green:       #4ade80;
+  --text:        #eef2ee;
+  --text-dim:    rgba(238,242,238,0.45);
+  --danger:      #ff5555;
+  --radius:      8px;
+  --radius-lg:   12px;
+}
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--pitch);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* pitch stripes */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 60px,
+    rgba(255,255,255,0.022) 60px, rgba(255,255,255,0.022) 120px
+  );
+  pointer-events: none;
+}
+
+#app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── LOADING ── */
+.loading-screen {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 100vh; gap: 16px;
+}
+.loading-ball { font-size: 48px; animation: spin 1.2s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.loading-text { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+
+/* ── HEADER ── */
+.fu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid var(--card-border);
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(10px);
+}
+.fu-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.fu-logo-icon { font-size: 22px; }
+.fu-logo-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--accent); line-height: 1; }
+.fu-logo-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+.fu-admin-btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 6px 14px; background: transparent; border: 1px solid var(--card-border);
+  color: var(--text-dim); border-radius: var(--radius); cursor: pointer; transition: all .2s;
+}
+.fu-admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── MAIN ── */
+.fu-main {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 60px; gap: 20px;
+}
+
+/* ── SCREEN ── */
+.fu-screen { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 16px; animation: fuUp .3s ease; }
+.fu-screen.wide { max-width: 560px; }
+@keyframes fuUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TYPOGRAPHY ── */
+.fu-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 3px; color: var(--accent); text-align: center; line-height: 1; }
+.fu-subtitle { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 2px; color: var(--text-dim); text-align: center; text-transform: uppercase; margin-top: -10px; }
+
+/* ── CARD ── */
+.fu-card { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 20px; }
+
+/* ── DATE ITEMS ── */
+.fu-date-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 16px 18px;
+  cursor: pointer; transition: all .18s;
+}
+.fu-date-item:hover { border-color: var(--accent); background: rgba(240,224,64,0.07); transform: translateY(-1px); }
+.fu-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 21px; letter-spacing: 1px; color: var(--accent); }
+.fu-date-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text-dim); letter-spacing: 1px; margin-top: 3px; }
+.fu-date-count { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--green); letter-spacing: 1px; white-space: nowrap; }
+.fu-date-arrow { color: var(--text-dim); margin-left: 8px; }
+
+/* ── BUTTONS ── */
+.fu-btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 15px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 14px 20px; border-radius: var(--radius);
+  cursor: pointer; border: none; transition: all .15s; width: 100%; display: block;
+}
+.fu-btn-primary { background: var(--accent); color: #1a1a1a; font-weight: 700; }
+.fu-btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.fu-btn-primary:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.fu-btn-secondary { background: transparent; border: 1px solid var(--card-border); color: var(--text); }
+.fu-btn-secondary:hover { border-color: var(--green); color: var(--green); }
+.fu-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.08); color: var(--text-dim); font-size: 12px; padding: 10px; }
+.fu-btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+
+/* ── INPUTS ── */
+.fu-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 6px; display: block; }
+.fu-input {
+  background: rgba(0,0,0,0.25); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 13px 14px;
+  font-family: 'Barlow', sans-serif; font-size: 15px; color: var(--text);
+  outline: none; transition: border .2s; width: 100%;
+}
+.fu-input:focus { border-color: var(--accent); }
+.fu-input::placeholder { color: rgba(238,242,238,0.2); }
+
+/* ── LOCKED ── */
+.fu-locked {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.25);
+  border-radius: var(--radius); padding: 10px 14px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px; color: #ff9999;
+}
+
+/* ── META GRID ── */
+.fu-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--card-border); border-radius: var(--radius); overflow: hidden; }
+.fu-meta-cell { background: var(--card); padding: 14px 16px; }
+.fu-meta-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.fu-meta-value { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--text); font-weight: 600; line-height: 1.3; }
+
+/* ── COUNTDOWN ── */
+.fu-cd {
+  display: flex; gap: 4px; justify-content: center; align-items: flex-end;
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 16px 12px;
+}
+.fu-cd-unit { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.fu-cd-num { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--accent); line-height: 1; min-width: 54px; text-align: center; }
+.fu-cd-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+.fu-cd-sep { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--text-dim); opacity: 0.4; line-height: 1; padding-bottom: 10px; }
+
+/* ── FIELD ── */
+.fu-field-wrap { width: 100%; border-radius: var(--radius-lg); overflow: hidden; border: 2px solid rgba(255,255,255,0.07); }
+.fu-field-wrap svg { display: block; width: 100%; height: auto; }
+
+/* ── MODAL ── */
+.fu-modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 16px; backdrop-filter: blur(6px);
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.fu-modal {
+  background: #1c3a2c; border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg); padding: 26px 22px;
+  width: 100%; max-width: 360px;
+  animation: slideUp .25s ease;
+}
+@keyframes slideUp { from { transform:translateY(16px);opacity:0; } to { transform:translateY(0);opacity:1; } }
+.fu-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: var(--accent); margin-bottom: 16px; }
+.fu-modal-err { color: #ff9999; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; margin-top: 8px; letter-spacing: 1px; }
+.fu-modal-row { display: flex; gap: 10px; margin-top: 16px; }
+
+/* ── ADMIN ── */
+.fu-admin-title { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 3px; color: var(--accent); }
+.fu-section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 12px; }
+.fu-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fu-game-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius); padding: 11px 14px;
+}
+.fu-game-row.locked { border-color: rgba(255,80,80,0.2); }
+.fu-game-row-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--text); font-weight: 600; }
+.fu-game-row-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.fu-game-actions { display: flex; gap: 5px; flex-shrink: 0; margin-left: 8px; }
+.fu-sm-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1px; padding: 5px 10px; border-radius: 4px; cursor: pointer; background: transparent; border: 1px solid; transition: all .15s; }
+.fu-sm-btn.lock   { border-color: rgba(255,80,80,0.35); color: #ff9999; }
+.fu-sm-btn.lock:hover { background: rgba(255,80,80,0.1); }
+.fu-sm-btn.unlock { border-color: rgba(74,222,128,0.35); color: var(--green); }
+.fu-sm-btn.unlock:hover { background: rgba(74,222,128,0.1); }
+.fu-sm-btn.del { border-color: rgba(255,80,80,0.25); color: #ff9999; }
+.fu-sm-btn.del:hover { background: rgba(255,80,80,0.1); }
+.fu-sm-btn.view { border-color: rgba(240,224,64,0.25); color: var(--accent); }
+.fu-sm-btn.view:hover { background: rgba(240,224,64,0.07); }
+.fu-player-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 6px; padding: 9px 13px;
+}
+.fu-player-num { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--accent); min-width: 22px; }
+.fu-player-name-txt { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; color: var(--text); margin-left: 10px; }
+
+/* ── TOAST ── */
+#toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 999; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.fu-toast {
+  background: var(--accent); color: #1a1a1a;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 1px;
+  padding: 11px 22px; border-radius: 100px; white-space: nowrap;
+  animation: toastIn .25s ease;
+}
+@keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── EMPTY ── */
+.fu-empty { text-align: center; padding: 32px 16px; color: var(--text-dim); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; letter-spacing: 1px; line-height: 1.8; }
+
+/* ── ACTION CENTER BOX ── */
+.action-date-box { text-align: center; padding: 16px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px; }
+.action-date-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: var(--accent); }
+.action-date-time { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; color: var(--text-dim); letter-spacing: 2px; margin-top: 4px; }
+
+@media (max-width: 400px) {
+  .fu-cd-num { font-size: 30px; min-width: 42px; }
+  .fu-title { font-size: 30px; }
+}
