@@ -223,3 +223,45 @@ body::before {
   .fu-cd-num { font-size: 30px; min-width: 42px; }
   .fu-title { font-size: 30px; }
 }
+
+/* ── LANG TOGGLE ── */
+.fu-lang-btn {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 6px 12px; background: rgba(240,224,64,0.1); border: 1px solid rgba(240,224,64,0.3);
+  color: var(--accent); border-radius: var(--radius); cursor: pointer; transition: all .2s;
+}
+.fu-lang-btn:hover { background: rgba(240,224,64,0.2); }
+
+/* ── ORG BADGE ── */
+.fu-org-badge {
+  text-align: center; font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px; letter-spacing: 2px; color: rgba(238,242,238,0.35);
+  text-transform: uppercase; margin-bottom: -8px;
+}
+
+/* ── SECTION PILL ── */
+.fu-section-pill {
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; background: rgba(240,224,64,0.08);
+  border: 1px solid rgba(240,224,64,0.2); border-radius: 100px;
+  width: fit-content;
+}
+.fu-section-pill.past {
+  color: rgba(238,242,238,0.4); background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+/* ── PAST MATCH ITEM ── */
+.fu-date-item.past-item { opacity: 0.6; cursor: pointer; }
+.fu-date-item.past-item:hover { opacity: 0.85; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+/* ── FOOTER ── */
+.fu-footer {
+  text-align: center; padding: 20px 16px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+  letter-spacing: 2px; color: rgba(238,242,238,0.2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  text-transform: uppercase;
+}
