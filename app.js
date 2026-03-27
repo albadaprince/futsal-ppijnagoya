@@ -2,10 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import {
   getFirestore, collection, doc,
   onSnapshot, addDoc, updateDoc, deleteDoc,
-  query, orderBy, arrayUnion, arrayRemove
+  getDoc, query, orderBy, arrayUnion, arrayRemove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ── CONFIG ──
+// ── CONFIG ── (safe to be public — just identifies your Firebase project)
 const firebaseConfig = {
   apiKey: "AIzaSyAhC_ppeMTRonAEZK1tyaSYXbFNvC7aCJQ",
   authDomain: "futsal-ppi.firebaseapp.com",
@@ -15,7 +15,7 @@ const firebaseConfig = {
   appId: "1:277761250199:web:2af9e816f42222b02baad2"
 };
 
-const ADMIN_PASSWORD = "futsal2025";
+// No password here — it lives in Firestore > config > admin > password
 const LOCATION = "Nagoya University Futsal Court";
 
 const app = initializeApp(firebaseConfig);
@@ -39,7 +39,7 @@ function fmtDate(d) {
 function fmtTime(t) {
   if (!t) return "";
   const [h, m] = t.split(":").map(Number);
-  return `${h % 12 || 12}:${String(m).padStart(2,"0")} ${h >= 12 ? "PM" : "AM"}`;
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h >= 12 ? "PM" : "AM"}`;
 }
 function pad(n) { return String(n).padStart(2, "0"); }
 function sel(id) { return document.getElementById(id); }
@@ -52,6 +52,18 @@ function showToast(msg) {
   t.textContent = msg;
   tc.appendChild(t);
   setTimeout(() => t.remove(), 2600);
+}
+
+// ── ADMIN PASSWORD — fetched from Firestore, never in code ──
+async function checkAdminPassword(input) {
+  try {
+    const snap = await getDoc(doc(db, "config", "admin"));
+    if (!snap.exists()) return false;
+    return snap.data().password === input;
+  } catch (e) {
+    console.error("Could not verify password", e);
+    return false;
+  }
 }
 
 // ── FIELD SVG ──
@@ -78,15 +90,12 @@ function buildFieldSVG(players) {
 
   const positions = getPositions(n);
   const pitchCols = ["#195c30", "#1a6435"];
-
   let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
 
-  // Stripes
   for (let i = 0; i < 10; i++) {
     svg += `<rect x="0" y="${i * 58}" width="${W}" height="58" fill="${pitchCols[i % 2]}"/>`;
   }
 
-  // Lines
   svg += `
     <rect x="16" y="16" width="${W-32}" height="${H-32}" rx="3" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
     <line x1="16" y1="${H/2}" x2="${W-16}" y2="${H/2}" stroke="rgba(255,255,255,0.28)" stroke-width="1.2"/>
@@ -100,11 +109,10 @@ function buildFieldSVG(players) {
     <circle cx="${W/2}" cy="${H-96}" r="3" fill="rgba(255,255,255,0.4)"/>
   `;
 
-  // Players
   positions.forEach((p, i) => {
     const name = players[i];
-    const safe = name.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    const initials = name.slice(0,2).toUpperCase();
+    const safe = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const initials = name.slice(0, 2).toUpperCase();
     const nw = Math.max(name.length * 7 + 10, 40);
     svg += `
       <g transform="translate(${p.x},${p.y})">
@@ -120,7 +128,6 @@ function buildFieldSVG(players) {
   if (!n) {
     svg += `<text x="${W/2}" y="${H/2+6}" font-family="'Barlow Condensed',sans-serif" font-size="14" fill="rgba(255,255,255,0.22)" text-anchor="middle" letter-spacing="2">NO PLAYERS YET</text>`;
   }
-
   svg += `</svg>`;
   return svg;
 }
@@ -166,9 +173,8 @@ function render() {
     <main class="fu-main">
   `;
 
-  // ── DATES SCREEN ──
   if (currentScreen === "dates") {
-    html += `<div class="fu-screen" id="screen">
+    html += `<div class="fu-screen">
       <div class="fu-title">Next Matches</div>
       <div class="fu-subtitle">Tap a match to sign up or check the lineup</div>`;
     if (!sorted.length) {
@@ -181,18 +187,15 @@ function render() {
               <div class="fu-date-day">${fmtDate(g.date)} ${g.locked ? "🔒" : ""}</div>
               <div class="fu-date-meta">${fmtTime(g.time)} · ${LOCATION}</div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <div class="fu-date-count">${g.players.length} in 👥</div>
-            </div>
+            <div class="fu-date-count">${g.players.length} in 👥</div>
           </div>`;
       });
     }
     html += `</div>`;
   }
 
-  // ── ACTION SCREEN ──
   else if (currentScreen === "action" && game) {
-    html += `<div class="fu-screen" id="screen">
+    html += `<div class="fu-screen">
       <div class="fu-title">Game Day</div>
       <div class="fu-card" style="display:flex;flex-direction:column;gap:14px;">
         <div class="action-date-box">
@@ -207,9 +210,8 @@ function render() {
     </div>`;
   }
 
-  // ── JOIN SCREEN ──
   else if (currentScreen === "join" && game) {
-    html += `<div class="fu-screen" id="screen">
+    html += `<div class="fu-screen">
       <div class="fu-title">I'm In</div>
       <div class="fu-subtitle">Add your name to the lineup</div>
       <div class="fu-card" style="display:flex;flex-direction:column;gap:14px;">
@@ -223,31 +225,16 @@ function render() {
     </div>`;
   }
 
-  // ── LINEUP SCREEN ──
   else if (currentScreen === "lineup" && game) {
-    html += `<div class="fu-screen wide" id="screen">
+    html += `<div class="fu-screen wide">
       <div class="fu-title">Lineup</div>
       <div class="fu-subtitle">${game.players.length} player${game.players.length !== 1 ? "s" : ""} ready to play</div>
-
       <div class="fu-meta">
-        <div class="fu-meta-cell">
-          <div class="fu-meta-label">📅 Date</div>
-          <div class="fu-meta-value">${fmtDate(game.date)}</div>
-        </div>
-        <div class="fu-meta-cell">
-          <div class="fu-meta-label">⏰ Kick-off</div>
-          <div class="fu-meta-value">${fmtTime(game.time)}</div>
-        </div>
-        <div class="fu-meta-cell">
-          <div class="fu-meta-label">📍 Location</div>
-          <div class="fu-meta-value" style="font-size:12px;line-height:1.4;">Nagoya University<br/>Futsal Court</div>
-        </div>
-        <div class="fu-meta-cell">
-          <div class="fu-meta-label">👥 Squad</div>
-          <div class="fu-meta-value">${game.players.length} signed up</div>
-        </div>
+        <div class="fu-meta-cell"><div class="fu-meta-label">📅 Date</div><div class="fu-meta-value">${fmtDate(game.date)}</div></div>
+        <div class="fu-meta-cell"><div class="fu-meta-label">⏰ Kick-off</div><div class="fu-meta-value">${fmtTime(game.time)}</div></div>
+        <div class="fu-meta-cell"><div class="fu-meta-label">📍 Location</div><div class="fu-meta-value" style="font-size:12px;line-height:1.4;">Nagoya University<br/>Futsal Court</div></div>
+        <div class="fu-meta-cell"><div class="fu-meta-label">👥 Squad</div><div class="fu-meta-value">${game.players.length} signed up</div></div>
       </div>
-
       <div class="fu-cd">
         <div class="fu-cd-unit"><div class="fu-cd-num" id="cd-d">00</div><div class="fu-cd-lbl">Days</div></div>
         <div class="fu-cd-sep">:</div>
@@ -257,29 +244,20 @@ function render() {
         <div class="fu-cd-sep">:</div>
         <div class="fu-cd-unit"><div class="fu-cd-num" id="cd-s">00</div><div class="fu-cd-lbl">Secs</div></div>
       </div>
-
       <div class="fu-field-wrap">${buildFieldSVG(game.players)}</div>
       <button class="fu-btn fu-btn-ghost" onclick="goTo('action')">← Back</button>
     </div>`;
   }
 
-  // ── ADMIN SCREEN ──
   else if (currentScreen === "admin") {
     const adminGame = games.find(g => g.id === adminViewGameId);
-    html += `<div class="fu-screen wide" id="screen">
+    html += `<div class="fu-screen wide">
       <div class="fu-admin-title">Admin Panel</div>
-
       <div class="fu-card" style="display:flex;flex-direction:column;gap:14px;">
         <div class="fu-section-label">Add New Match</div>
         <div class="fu-form-row">
-          <div>
-            <label class="fu-label">Date</label>
-            <input class="fu-input" id="new-date" type="date" />
-          </div>
-          <div>
-            <label class="fu-label">Time</label>
-            <input class="fu-input" id="new-time" type="time" value="19:00" />
-          </div>
+          <div><label class="fu-label">Date</label><input class="fu-input" id="new-date" type="date" /></div>
+          <div><label class="fu-label">Time</label><input class="fu-input" id="new-time" type="time" value="19:00" /></div>
         </div>
         <button class="fu-btn fu-btn-primary" onclick="addGame()">+ Add Match</button>
       </div>
@@ -295,7 +273,7 @@ function render() {
                 <div class="fu-game-row-meta">${fmtTime(g.time)} · ${g.players.length} player${g.players.length!==1?"s":""}</div>
               </div>
               <div class="fu-game-actions">
-                <button class="fu-sm-btn ${g.locked ? "unlock" : "lock"}" onclick="toggleLock('${g.id}')">${g.locked ? "Unlock" : "Lock"}</button>
+                <button class="fu-sm-btn ${g.locked?"unlock":"lock"}" onclick="toggleLock('${g.id}')">${g.locked?"Unlock":"Lock"}</button>
                 <button class="fu-sm-btn view" onclick="viewPlayers('${g.id}')">Players</button>
                 <button class="fu-sm-btn del" onclick="deleteGame('${g.id}')">Del</button>
               </div>
@@ -323,18 +301,17 @@ function render() {
     </div>`;
   }
 
-  html += `</main>`;
-
-  // Modal
-  html += `
+  html += `</main>
     <div id="admin-modal" class="fu-modal-bg" style="display:none;">
       <div class="fu-modal">
         <div class="fu-modal-title">Admin Access</div>
         <div>
           <label class="fu-label">Password</label>
-          <input class="fu-input" id="admin-pw" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkAdmin()" />
+          <input class="fu-input" id="admin-pw" type="password" placeholder="Enter admin password"
+            onkeydown="if(event.key==='Enter')checkAdmin()" />
         </div>
         <div id="admin-err" class="fu-modal-err" style="display:none;">Wrong password. Try again.</div>
+        <div id="admin-checking" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:rgba(238,242,238,0.45);margin-top:8px;letter-spacing:1px;">Checking...</div>
         <div class="fu-modal-row">
           <button class="fu-btn fu-btn-primary" style="flex:1;" onclick="checkAdmin()">Enter</button>
           <button class="fu-btn fu-btn-secondary" style="flex:1;" onclick="closeAdminModal()">Cancel</button>
@@ -344,7 +321,6 @@ function render() {
 
   root.innerHTML = html;
 
-  // Post-render setup
   if (currentScreen === "join") {
     const inp = sel("player-input");
     if (inp) { inp.focus(); inp.onkeydown = e => { if(e.key==="Enter") joinGame(); }; }
@@ -354,9 +330,6 @@ function render() {
   } else {
     if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   }
-  if (currentScreen === "admin") {
-    const nd = sel("new-date"); if(nd) nd.valueAsDate = null;
-  }
 }
 
 // ── NAVIGATION ──
@@ -365,12 +338,7 @@ window.goTo = function(screen) {
   if (screen === "dates") { selectedGameId = null; adminViewGameId = null; }
   render();
 };
-
-window.selectGame = function(id) {
-  selectedGameId = id;
-  currentScreen = "action";
-  render();
-};
+window.selectGame = function(id) { selectedGameId = id; currentScreen = "action"; render(); };
 
 // ── JOIN ──
 window.joinGame = async function() {
@@ -381,39 +349,52 @@ window.joinGame = async function() {
   if (!game) return;
   if (game.locked) { showToast("Registration is closed!"); return; }
   if (game.players.some(p => p.toLowerCase() === name.toLowerCase())) {
-    showToast("You're already in! 🎉"); goTo("lineup"); return;
+    showToast("You're already in! 🎉"); currentScreen = "lineup"; render(); return;
   }
   try {
     await updateDoc(doc(db, "games", game.id), { players: arrayUnion(name) });
     showToast(`${name} added to the lineup! ⚽`);
-    currentScreen = "lineup";
-    render();
+    currentScreen = "lineup"; render();
   } catch(e) { showToast("Error — try again"); console.error(e); }
 };
 
-// ── ADMIN ──
+// ── ADMIN MODAL ──
 window.openAdminModal = function() {
   render();
   const m = sel("admin-modal"); if(m) m.style.display = "flex";
   setTimeout(() => { const pw = sel("admin-pw"); if(pw) pw.focus(); }, 100);
 };
-
 window.closeAdminModal = function() {
   const m = sel("admin-modal"); if(m) m.style.display = "none";
 };
 
-window.checkAdmin = function() {
+// Password verified against Firestore — zero secrets in source code
+window.checkAdmin = async function() {
   const pw = sel("admin-pw");
-  if (pw && pw.value === ADMIN_PASSWORD) {
+  const err = sel("admin-err");
+  const checking = sel("admin-checking");
+  if (!pw) return;
+
+  if (err) err.style.display = "none";
+  if (checking) checking.style.display = "block";
+  pw.disabled = true;
+
+  const ok = await checkAdminPassword(pw.value);
+
+  pw.disabled = false;
+  if (checking) checking.style.display = "none";
+
+  if (ok) {
     closeAdminModal();
     currentScreen = "admin";
     render();
   } else {
-    const err = sel("admin-err"); if(err) err.style.display = "block";
-    if(pw) { pw.value = ""; pw.focus(); }
+    if (err) err.style.display = "block";
+    pw.value = ""; pw.focus();
   }
 };
 
+// ── ADMIN ACTIONS ──
 window.addGame = async function() {
   const date = sel("new-date")?.value;
   const time = sel("new-time")?.value || "19:00";
