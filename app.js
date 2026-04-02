@@ -534,9 +534,9 @@ function render() {
     html += '<div class="fu-section-label">📢 ' + tr("manageAnnouncements") + '</div>';
     html += '<div style="display:flex;flex-direction:column;gap:8px;">';
     html += '<div><label class="fu-label">' + tr("announcementTitle") + '</label>';
-    html += '<input class="fu-input" id="ann-title" type="text" placeholder="' + tr("announcementTitlePlaceholder") + '" maxlength="80"/></div>';
+    html += '<input class="fu-input" id="ann-title" type="text" placeholder="' + tr("announcementTitlePlaceholder") + '" maxlength="150"/></div>';
     html += '<div><label class="fu-label">' + tr("announcementDesc") + '</label>';
-    html += '<textarea class="fu-input fu-textarea" id="ann-desc" placeholder="' + tr("announcementDescPlaceholder") + '" maxlength="400" rows="3"></textarea></div>';
+    html += '<textarea class="fu-input fu-textarea" id="ann-desc" placeholder="' + tr("announcementDescPlaceholder") + '" maxlength="2000" rows="5"></textarea></div>';
     html += '</div>';
     html += '<button class="fu-btn fu-btn-primary" onclick="addAnnouncement()">' + tr("addAnnouncement") + '</button>';
     if (annSorted.length > 0) {
