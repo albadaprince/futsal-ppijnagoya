@@ -265,3 +265,45 @@ body::before {
   border-top: 1px solid rgba(255,255,255,0.05);
   text-transform: uppercase;
 }
+
+/* ── ANNOUNCEMENTS ── */
+.announce-pill {
+  color: #f0e040;
+  background: rgba(240,224,64,0.08);
+  border-color: rgba(240,224,64,0.2);
+}
+.fu-announce-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 6px;
+  transition: border .2s;
+}
+.fu-announce-card.pinned {
+  border-color: rgba(240,224,64,0.3);
+  background: rgba(240,224,64,0.05);
+}
+.fu-announce-pin {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 2px;
+}
+.fu-announce-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px; font-weight: 700; color: var(--text);
+  letter-spacing: 0.5px;
+}
+.fu-announce-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px; color: rgba(238,242,238,0.65);
+  line-height: 1.5;
+}
+
+/* ── TEXTAREA ── */
+.fu-textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+  padding-top: 10px;
+}
