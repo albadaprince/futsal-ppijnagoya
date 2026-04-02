@@ -323,22 +323,25 @@ function startCountdown(date, time) {
 
 function renderAnnouncements() {
   if (!announcements.length) return "";
-  // pinned first, then by createdAt desc
   var sorted = announcements.slice().sort(function(a, b) {
     if (a.pinned && !b.pinned) return -1;
     if (!a.pinned && b.pinned) return 1;
     return (b.createdAt || 0) - (a.createdAt || 0);
   });
-  var html = '<div class="fu-section-pill announce-pill">📢 ' + tr("announcements") + '</div>';
-  sorted.forEach(function(a) {
-    html += '<div class="fu-announce-card' + (a.pinned ? ' pinned' : '') + '">';
-    if (a.pinned) {
-      html += '<div class="fu-announce-pin">' + tr("pinned") + '</div>';
-    }
-    html += '<div class="fu-announce-title">' + escHtml(a.title) + '</div>';
-    html += '<div class="fu-announce-desc">' + escHtml(a.desc) + '</div>';
-    html += '</div>';
-  });
+  var isOpen = window._annOpen !== false;
+  var html = '<div class="fu-section-pill announce-pill" onclick="toggleAnn()" style="cursor:pointer;user-select:none;justify-content:space-between;width:100%;box-sizing:border-box;">';
+  html += '<span>📢 ' + tr("announcements") + '</span>';
+  html += '<span style="font-size:14px;margin-left:8px;">' + (isOpen ? '▲' : '▼') + '</span>';
+  html += '</div>';
+  if (isOpen) {
+    sorted.forEach(function(a) {
+      html += '<div class="fu-announce-card' + (a.pinned ? ' pinned' : '') + '">';
+      if (a.pinned) html += '<div class="fu-announce-pin">' + tr("pinned") + '</div>';
+      html += '<div class="fu-announce-title">' + escHtml(a.title) + '</div>';
+      html += '<div class="fu-announce-desc">' + escHtml(a.desc) + '</div>';
+      html += '</div>';
+    });
+  }
   return html;
 }
 
@@ -592,6 +595,10 @@ function render() {
 }
 
 // ── NAVIGATION ──
+window.toggleAnn = function() {
+  window._annOpen = window._annOpen === false ? true : false;
+  render();
+};
 window.toggleLang = function() { lang = lang === "id" ? "en" : "id"; render(); };
 window.goTo = function(screen) {
   currentScreen = screen;
