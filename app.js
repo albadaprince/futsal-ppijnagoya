@@ -635,7 +635,7 @@ function render() {
   html += '<div style="width:100%;max-width:480px;margin:0 auto;padding:0 16px;">';
 html += '<div class="fu-card" style="display:flex;flex-direction:column;gap:12px;">';
 html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px;color:#f0e040;">📬 '+(lang==="id"?"Langganan Update":"Subscribe for Updates")+'</div>';
-html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(238,242,238,0.45);">'+(lang==="id"?"Masukkan emailmu untuk dapat notifikasi jadwal pertandingan.":"Enter your email to get notified about match schedules.")+'</div>';
+html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(238,242,238,0.45);">'+(lang==="id"?"Masukkan emailmu untuk dapat notifikasi jadwal pertandingan tiap bulannya.":"Enter your email to get notified about match schedules once a month.")+'</div>';
 html += '<input class="fu-input" id="subscribe-name" type="text" placeholder="'+(lang==="id"?"Nama kamu":"Your name")+'" maxlength="20"/>';
 html += '<input class="fu-input" id="subscribe-email" type="email" placeholder="'+(lang==="id"?"Email kamu":"Your email")+'"/>';
 html += '<button class="fu-btn fu-btn-secondary" onclick="subscribeEmail()">'+(lang==="id"?"🔔 Langganan":"🔔 Subscribe")+'</button>';
