@@ -632,7 +632,15 @@ function render() {
     html += '<button class="fu-btn fu-btn-ghost" onclick="goTo(\'dates\')">'+tr("exitAdmin")+'</button></div>';
   }
 
-  html += '</main><footer class="fu-footer"><span>'+tr("vibeCredit")+'</span></footer>';
+  hhtml += '<div style="width:100%;max-width:480px;margin:0 auto;padding:0 16px;">';
+html += '<div class="fu-card" style="display:flex;flex-direction:column;gap:12px;">';
+html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px;color:#f0e040;">📬 '+(lang==="id"?"Langganan Update":"Subscribe for Updates")+'</div>';
+html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(238,242,238,0.45);">'+(lang==="id"?"Masukkan emailmu untuk dapat notifikasi jadwal pertandingan.":"Enter your email to get notified about match schedules.")+'</div>';
+html += '<input class="fu-input" id="subscribe-name" type="text" placeholder="'+(lang==="id"?"Nama kamu":"Your name")+'" maxlength="20"/>';
+html += '<input class="fu-input" id="subscribe-email" type="email" placeholder="'+(lang==="id"?"Email kamu":"Your email")+'"/>';
+html += '<button class="fu-btn fu-btn-secondary" onclick="subscribeEmail()">'+(lang==="id"?"🔔 Langganan":"🔔 Subscribe")+'</button>';
+html += '</div></div>';
+html += '</main><footer class="fu-footer"><span>'+tr("vibeCredit")+'</span></footer>';
 
   // Modal
   html += '<div id="admin-modal" class="fu-modal-bg" style="display:none;"><div class="fu-modal">';
@@ -807,7 +815,22 @@ window.togglePin = async function(id) {
   catch(e) { showToast(tr("errorRetry")); }
 };
 
+
 // ── EMAIL ──
+window.subscribeEmail = async function() {
+  var nameEl = sel("subscribe-name"), emailEl = sel("subscribe-email");
+  var name = nameEl ? nameEl.value.trim() : "";
+  var email = emailEl ? emailEl.value.trim().toLowerCase() : "";
+  if (!name) { showToast(lang==="id"?"Masukkan namamu!":"Enter your name!"); return; }
+  if (!email || !email.includes("@")) { showToast(lang==="id"?"Masukkan email yang valid!":"Enter a valid email!"); return; }
+  var already = (window._subscribers||[]).some(function(s){return s.email===email;});
+  if (already) { showToast(lang==="id"?"Email sudah terdaftar! ✅":"Already subscribed! ✅"); return; }
+  try {
+    await addDoc(collection(db,"subscribers"), { name:name, email:email, joinedAt:Date.now() });
+    showToast(lang==="id"?"Berhasil langganan! 🎉":"Subscribed successfully! 🎉");
+    if(nameEl) nameEl.value=""; if(emailEl) emailEl.value="";
+  } catch(e) { showToast(lang==="id"?"Error — coba lagi":"Error — try again"); }
+};
 window.copyEmails = function() {
   var emails = (window._subscribers||[]).map(function(s){return s.email;}).join(", ");
   navigator.clipboard.writeText(emails).then(function(){showToast(tr("emailCopied"));}).catch(function(){showToast(tr("errorRetry"));});
