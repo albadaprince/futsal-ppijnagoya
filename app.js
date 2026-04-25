@@ -632,7 +632,7 @@ function render() {
     html += '<button class="fu-btn fu-btn-ghost" onclick="goTo(\'dates\')">'+tr("exitAdmin")+'</button></div>';
   }
 
-  hhtml += '<div style="width:100%;max-width:480px;margin:0 auto;padding:0 16px;">';
+  html += '<div style="width:100%;max-width:480px;margin:0 auto;padding:0 16px;">';
 html += '<div class="fu-card" style="display:flex;flex-direction:column;gap:12px;">';
 html += '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:20px;letter-spacing:2px;color:#f0e040;">📬 '+(lang==="id"?"Langganan Update":"Subscribe for Updates")+'</div>';
 html += '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;letter-spacing:1px;color:rgba(238,242,238,0.45);">'+(lang==="id"?"Masukkan emailmu untuk dapat notifikasi jadwal pertandingan.":"Enter your email to get notified about match schedules.")+'</div>';
